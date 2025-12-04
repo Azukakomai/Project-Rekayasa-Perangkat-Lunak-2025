@@ -1,15 +1,4 @@
-console.log(`[${new Date().toISOString()}] --- server.js execution started ---`);
 
-console.log('--- Dotenv Debug ---');
-try {
-    const result = require('dotenv').config({ path: 'E:/Projects/PRPL/.env', debug: true });
-    console.log('Dotenv result:', result);
-} catch (e) {
-    console.error('Dotenv error:', e);
-}
-console.log('process.env.SUPABASE_URL:', process.env.SUPABASE_URL);
-console.log('process.env.SUPABASE_KEY:', process.env.SUPABASE_KEY);
-console.log('--- End Dotenv Debug ---');
 /*
 ================================================================================
  PRPL Village Infrastructure Backend Server
@@ -670,12 +659,19 @@ apiRouter.get('/metrics/projects-by-month', async (req, res) => {
 app.use('/api', apiRouter);
 
 // =============================================================================
-// 5. START THE SERVER
+// 5. START THE SERVER / EXPORT FOR SERVERLESS
 // =============================================================================
-app.listen(PORT, () => {
+
+// This is for local development.
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
     console.log(`Test with: GET http://localhost:${PORT}/api/projects`);
-});
+  });
+}
+
+// Export the app for serverless environments (like Netlify)
+module.exports = app;
 
 
 
