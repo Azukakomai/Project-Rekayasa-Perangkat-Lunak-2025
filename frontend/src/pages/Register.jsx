@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link } from "react-router-dom";
+import api from "../api";
 
-export default function Register() {
-  const navigate = useNavigate();
+export default function Register({ onRegister }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,14 +13,19 @@ export default function Register() {
     setError("");
 
     try {
-      await axios.post("/api/auth/register", {
+      const response = await api.post("/auth/register", {
         name,
         email,
         password,
         role: "villager", // Hard-coding role for now
       });
 
-      navigate("/login");
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        onRegister(response.data.user);
+      } else {
+        setError("Registration succeeded, but no token was received. Please log in.");
+      }
     } catch (err) {
       setError(
         err.response?.data?.error || "An error occurred during registration."
